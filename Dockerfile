@@ -8,7 +8,11 @@ RUN apt update && apt install --yes --quiet --no-install-recommends \
   build-essential \
   gdb \
   cmake  \
-  wget \
+  wget  \
+  curl  \
+  zip  \
+  unzip \
+  tar \
   ca-certificates
 
 RUN apt clean -y && apt autoremove -y
