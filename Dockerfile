@@ -7,7 +7,8 @@ RUN apt update && apt install --yes --quiet --no-install-recommends \
   pkg-config \
   build-essential \
   gdb \
-  cmake \
+  cmake  \
+  wget \
   ca-certificates
 
 RUN apt clean -y && apt autoremove -y
