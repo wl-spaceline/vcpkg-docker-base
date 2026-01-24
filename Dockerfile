@@ -1,19 +1,34 @@
-FROM debian:bookworm AS pegasus-base
+FROM debian:bookworm AS peg
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt update && apt install --yes --quiet --no-install-recommends \
-  sudo \
-  git \
-  pkg-config \
-  build-essential \
-  gdb \
-  cmake  \
-  wget  \
-  curl  \
-  zip  \
-  unzip \
-  tar \
-  ca-certificates
+    sudo \
+    git \
+    pkg-config \
+    build-essential \
+    gdb \
+    cmake  \
+    wget  \
+    curl  \
+    zip  \
+    unzip \
+    tar \
+    ca-certificates \
+    autoconf  \
+    autoconf-archive  \
+    automake \
+    libtool \
+    libltdl-dev \
+    linux-libc-dev \
+    python3
+
+# Additional packages for opencv... when we get to kork....
+#    python3 \
+#    python3-venv \
+#    bison \
+#    libx11-dev  \
+#    libxft-dev  \
+#    libxext-dev
 
 RUN apt clean -y && apt autoremove -y
 
@@ -36,4 +51,4 @@ ENV VCPKG_ROOT=/opt/vcpkg-${VCPKG_TAG}
 ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
 # Installing packages in classic mode instead of using a manifest file.
-RUN vcpkg install fmt gtest spdlog opencv grpc
+RUN vcpkg install fmt gtest spdlog grpc exiv2
