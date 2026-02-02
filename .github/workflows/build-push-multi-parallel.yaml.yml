@@ -1,4 +1,4 @@
-name: ci
+name: Build across multiple runners
 
 on:
   push:
