@@ -22,6 +22,20 @@ RUN apt update && apt install --yes --quiet --no-install-recommends \
     linux-libc-dev \
     python3
 
+## To install OpenCV...
+RUN apt install --yes --quiet --no-install-recommends \
+                     python3-venv \
+                     bison \
+                     libx11-dev \
+                     libxft-dev \
+                     libxext-dev \
+                     libxi-dev \
+                     libxtst-dev \
+                     libgles2-mesa-dev \
+                     libxrandr-dev
+
+RUN apt clean -y && apt autoremove -y
+
 # Create a runner user for better integration with GitHub
 ARG USERNAME=runner
 RUN useradd -m ${USERNAME} && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME}
@@ -41,20 +55,4 @@ ENV VCPKG_ROOT=/opt/vcpkg-${VCPKG_TAG}
 ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
 # Installing packages in classic mode instead of using a manifest file.
-RUN vcpkg install fmt gtest spdlog grpc exiv2
-
-## To install OpenCV...
-RUN apt install --yes --quiet --no-install-recommends \
-                     python3-venv \
-                     bison \
-                     libx11-dev \
-                     libxft-dev \
-                     libxext-dev \
-                     libxi-dev \
-                     libxtst-dev \
-                     libgles2-mesa-dev \
-                     libxrandr-dev
-
-RUN apt clean -y && apt autoremove -y
-
-RUN vcpkg install opencv
+RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv
