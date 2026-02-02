@@ -1,0 +1,11 @@
+name: Dummy test
+on:
+  push:
+
+jobs:
+  dummy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test runner
+        run: ls -la /home/runner/*/**
