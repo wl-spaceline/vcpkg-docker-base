@@ -6,7 +6,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  FULL_NAME: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+  FULL_NAME: ghcr.io/${{ env.IMAGE_NAME }}
 
 jobs:
   build:
@@ -61,7 +61,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ env.FULL_NAME }}
           push: true
-          outputs: type=image,push-by-digest=true,name-canonical=true
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha
           cache-to: type=gha,mode=min
 
