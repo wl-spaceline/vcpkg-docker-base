@@ -1,7 +1,9 @@
-name: Build across multiple runners
+name: Release across multiple runners
 
 on:
-  push:
+  release:
+    types:
+      - published
 
 env:
   REGISTRY: ghcr.io
@@ -26,6 +28,9 @@ jobs:
       attestations: write
 
     steps:
+      - name: Delete huge unnecessary tools folder
+        run: df -h && rm -rf /opt/hostedtoolcache && df -h
+
       - name: Checking out
         uses: actions/checkout@v5
 
