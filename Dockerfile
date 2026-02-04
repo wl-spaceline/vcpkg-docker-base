@@ -55,4 +55,4 @@ ENV VCPKG_ROOT=/opt/vcpkg-${VCPKG_TAG}
 ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
 # Installing packages in classic mode instead of using a manifest file.
-RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv
+RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected
