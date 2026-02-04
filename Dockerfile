@@ -39,10 +39,13 @@ RUN useradd -m ${USERNAME} && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/
 WORKDIR /opt
 
 # Setting VCPKG tag to checkout
-ARG VCPKG_TAG=2026.01.16
+ENV VCPKG_TAG=2026.01.16
 
 # Instead of cloning, just download and unpack the target version.
-RUN wget https://github.com/microsoft/vcpkg/archive/refs/tags/${VCPKG_TAG}.tar.gz && tar xzf ${VCPKG_TAG}.tar.gz && rm ${VCPKG_TAG}.tar.gz && ln -sf ${VCPKG_TAG}.tar.gz vcpkg
+RUN wget https://github.com/microsoft/vcpkg/archive/refs/tags/${VCPKG_TAG}.tar.gz &&  \
+    tar xzf ${VCPKG_TAG}.tar.gz &&  \
+    rm ${VCPKG_TAG}.tar.gz &&  \
+    ln -sf vcpkg-${VCPKG_TAG} vcpkg
 RUN ./vcpkg-${VCPKG_TAG}/bootstrap-vcpkg.sh -disableMetrics
 
 # Set some environment variables
@@ -57,3 +60,5 @@ RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected boost && \
     rm -rf ${VCPKG_ROOT}/buildtrees && \
     rm -rf ${VCPKG_ROOT}/downloads && \
     rm -rf ${VCPKG_ROOT}/packages \
+
+RUN vcpkg list
