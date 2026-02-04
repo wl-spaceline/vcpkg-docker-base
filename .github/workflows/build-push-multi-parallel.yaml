@@ -66,7 +66,7 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=cache-${{ env.PLATFORM_PAIR }}
-          cache-to: type=gha,mode=max,scope=cache-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=min,scope=cache-${{ env.PLATFORM_PAIR }}
 
       - name: Export digest
         run: |
