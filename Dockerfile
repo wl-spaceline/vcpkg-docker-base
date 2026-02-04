@@ -1,4 +1,4 @@
-FROM debian:bookworm AS peg
+FROM debian:bookworm-slim AS core
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt update && apt install --yes --quiet --no-install-recommends \
@@ -20,21 +20,16 @@ RUN apt update && apt install --yes --quiet --no-install-recommends \
     libtool \
     libltdl-dev \
     linux-libc-dev \
-    python3
-
-## To install OpenCV...
-RUN apt install --yes --quiet --no-install-recommends \
-                     python3-venv \
-                     bison \
-                     libx11-dev \
-                     libxft-dev \
-                     libxext-dev \
-                     libxi-dev \
-                     libxtst-dev \
-                     libgles2-mesa-dev \
-                     libxrandr-dev
-
-RUN apt clean -y && apt autoremove -y
+    python3 \
+    python3-venv \
+    bison \
+    libx11-dev \
+    libxft-dev \
+    libxext-dev \
+    libxi-dev \
+    libxtst-dev \
+    libgles2-mesa-dev \
+    libxrandr-dev && apt clean -y && apt autoremove -y && rm -rf /var/lib/apt/lists/*
 
 # Create a runner user for better integration with GitHub
 ARG USERNAME=runner
@@ -55,4 +50,10 @@ ENV VCPKG_ROOT=/opt/vcpkg-${VCPKG_TAG}
 ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
 # Installing packages in classic mode instead of using a manifest file.
-RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected
+# Optional: To keep ONLY Release builds and not Debug symbols,
+# delete the debug folder (saves ~50% of the installed size):
+# rm -rf ${VCPKG_ROOT}/installed/x64-linux/debug
+RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected && \
+    rm -rf ${VCPKG_ROOT}/buildtrees && \
+    rm -rf ${VCPKG_ROOT}/downloads && \
+    rm -rf ${VCPKG_ROOT}/packages \
