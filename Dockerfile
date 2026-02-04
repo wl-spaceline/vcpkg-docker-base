@@ -42,18 +42,18 @@ WORKDIR /opt
 ARG VCPKG_TAG=2026.01.16
 
 # Instead of cloning, just download and unpack the target version.
-RUN wget https://github.com/microsoft/vcpkg/archive/refs/tags/${VCPKG_TAG}.tar.gz && tar xzf ${VCPKG_TAG}.tar.gz && rm ${VCPKG_TAG}.tar.gz
+RUN wget https://github.com/microsoft/vcpkg/archive/refs/tags/${VCPKG_TAG}.tar.gz && tar xzf ${VCPKG_TAG}.tar.gz && rm ${VCPKG_TAG}.tar.gz && ln -sf ${VCPKG_TAG}.tar.gz vcpkg
 RUN ./vcpkg-${VCPKG_TAG}/bootstrap-vcpkg.sh -disableMetrics
 
 # Set some environment variables
-ENV VCPKG_ROOT=/opt/vcpkg-${VCPKG_TAG}
+ENV VCPKG_ROOT=/opt/vcpkg
 ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
 # Installing packages in classic mode instead of using a manifest file.
 # Optional: To keep ONLY Release builds and not Debug symbols,
 # delete the debug folder (saves ~50% of the installed size):
 # rm -rf ${VCPKG_ROOT}/installed/x64-linux/debug
-RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected && \
+RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected boost && \
     rm -rf ${VCPKG_ROOT}/buildtrees && \
     rm -rf ${VCPKG_ROOT}/downloads && \
     rm -rf ${VCPKG_ROOT}/packages \
