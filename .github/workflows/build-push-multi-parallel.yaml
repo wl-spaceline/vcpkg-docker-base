@@ -126,28 +126,25 @@ jobs:
         id: push
         working-directory: ${{ runner.temp }}/digests
         run: |
-          # 1. Capture the tags from metadata
-          TAGS=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
 
-          # 2. Create the manifest and capture the output
-          # We use '2>&1' to make sure we capture the digest if it's printed to stderr
-          # and 'tee' so you can still see the output in your logs
-          MANIFEST_DIGEST=$(docker buildx imagetools create $TAGS \
-            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *) | tee /dev/stderr)
-
-          # 3. Pull the digest out of the imagetools output
-          # This specifically looks for the sha256:xxxx hash
-          DIGEST=$(echo "$MANIFEST_DIGEST" | grep -o 'sha256:[a-f0-9]\{64\}' | head -n 1)
-
-          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
-
-      - name: Inspect image
+      - name: Inspect and capture digest
+        id: inspect # We give it an ID so the next step can reference it
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          # Get the digest using the version tag
+          # We use 'tr -d' to clean up quotes from the JSON output
+          DIGEST=$(docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} --format '{{json .Manifest.Digest}}' | tr -d '"')
+
+          # Print to logs for your visibility
+          echo "Successfully merged manifest. Digest: $DIGEST"
+
+          # Save to outputs for the Attestation step
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
           
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-digest: ${{ steps.inspect.outputs.digest }}
           push-to-registry: true
