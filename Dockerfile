@@ -8,6 +8,7 @@ RUN apt update && apt install --yes --quiet --no-install-recommends \
     build-essential \
     gdb \
     cmake  \
+    nano  \
     wget  \
     curl  \
     zip  \
@@ -52,15 +53,10 @@ RUN ./vcpkg-${VCPKG_TAG}/bootstrap-vcpkg.sh -disableMetrics
 ENV VCPKG_ROOT=/opt/vcpkg-${VCPKG_TAG}
 ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
-# Installing packages in classic mode instead of using a manifest file.
-# Optional: To keep ONLY Release builds and not Debug symbols,
-# delete the debug folder (saves ~50% of the installed size):
-# rm -rf ${VCPKG_ROOT}/installed/x64-linux/debug
-RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected boost && \
-    rm -rf ${VCPKG_ROOT}/buildtrees && \
-    rm -rf ${VCPKG_ROOT}/downloads && \
-    rm -rf ${VCPKG_ROOT}/packages
+COPY scripts/cleanup-vcpkg.sh /
 
+# Installing packages in classic mode instead of using a manifest file and cleanung up installation to free some space
+RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected boost && /bin/bash /cleanup-vcpkg.sh
 RUN vcpkg list > /vcpkg-list.txt && cat /vcpkg-list.txt
 
 FROM scratch AS artifact
