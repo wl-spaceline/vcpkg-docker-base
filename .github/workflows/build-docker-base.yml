@@ -58,3 +58,12 @@ jobs:
           push: false
           cache-from: type=gha,scope=cache-${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=cache-${{ env.PLATFORM_PAIR }}
+          outputs: type=local,dest=./build-outputs
+          target: artifact
+
+      - name: Upload Package List
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ env.PLATFORM_PAIR }}
+          path: ./build-outputs/vcpkg-list.txt
+

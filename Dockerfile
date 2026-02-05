@@ -49,7 +49,7 @@ RUN wget https://github.com/microsoft/vcpkg/archive/refs/tags/${VCPKG_TAG}.tar.g
 RUN ./vcpkg-${VCPKG_TAG}/bootstrap-vcpkg.sh -disableMetrics
 
 # Set some environment variables
-ENV VCPKG_ROOT=/opt/vcpkg
+ENV VCPKG_ROOT=/opt/vcpkg-${VCPKG_TAG}
 ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
 # Installing packages in classic mode instead of using a manifest file.
@@ -59,6 +59,9 @@ ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsys
 RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected boost && \
     rm -rf ${VCPKG_ROOT}/buildtrees && \
     rm -rf ${VCPKG_ROOT}/downloads && \
-    rm -rf ${VCPKG_ROOT}/packages \
+    rm -rf ${VCPKG_ROOT}/packages
 
-RUN vcpkg list
+RUN vcpkg list > /vcpk-list && cat /vcpkg-list.txt
+
+FROM scratch as exporter
+COPY --from=core /vcpkg-list.txt .
