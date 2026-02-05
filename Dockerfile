@@ -61,7 +61,7 @@ RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected boost && \
     rm -rf ${VCPKG_ROOT}/downloads && \
     rm -rf ${VCPKG_ROOT}/packages
 
-RUN vcpkg list > /vcpk-list && cat /vcpkg-list.txt
+RUN vcpkg list > /vcpkg-list.txt && cat /vcpkg-list.txt
 
-FROM scratch as artifact
+FROM scratch AS artifact
 COPY --from=core /vcpkg-list.txt .
