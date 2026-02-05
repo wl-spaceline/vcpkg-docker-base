@@ -69,7 +69,7 @@ jobs:
             type=local,dest=./build-outputs
           cache-from: type=gha,scope=cache-${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=cache-${{ env.PLATFORM_PAIR }}
-          target: artifact
+          target: core
 
       - name: Export digest
         run: |
@@ -84,48 +84,6 @@ jobs:
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
-
-      - name: Upload Package List
-        uses: actions/upload-artifact@v4
-        with:
-          name: packages-${{ env.PLATFORM_PAIR }}
-          path: ./build-outputs/vcpkg-list.txt
-
-  load-asset:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write    # To upload assets to a release
-      id-token: write    # Still needed for your Attestations!
-      attestations: write
-      packages: write
-    needs: build
-    steps:
-      - name: Download all package lists
-        uses: actions/download-artifact@v4
-        with:
-          path: ./release-assets
-          pattern: packages-*
-          merge-multiple: true # This puts all files into the same folder
-
-      - name: Attach package lists to Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
-        run: |
-          # 1. Download all the artifacts into the current directory
-          gh run download ${{ github.run_id }} --pattern "pkg-*"
-  
-          # 2. Rename the files so they include the platform name in the filename
-          # This turns 'pkg-linux-amd64/packages.txt' -> 'packages-linux-amd64.txt'
-          for dir in pkg-*/; do
-            platform=${dir%/}           # remove trailing slash
-            platform=${platform#pkg-}    # remove 'pkg-' prefix
-            mv "$dir/packages-installed.txt" "./packages-${platform}.txt"
-          done
-  
-          # 3. Upload the files to the existing release
-          # 'gh release upload' will attach files to the release associated with the tag
-          gh release upload "$TAG" ./packages-*.txt --clobber
 
   merge:
     runs-on: ubuntu-latest
