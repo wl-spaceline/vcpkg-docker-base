@@ -57,4 +57,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           push: false
           cache-from: type=gha,scope=cache-${{ env.PLATFORM_PAIR }}
-          cache-to: type=gha,mode=min,scope=cache-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=max,scope=cache-${{ env.PLATFORM_PAIR }}
