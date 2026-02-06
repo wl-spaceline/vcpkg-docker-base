@@ -64,9 +64,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          outputs: | 
-            type=image,push-by-digest=true,name-canonical=true,push=true
-            type=local,dest=./build-outputs
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=cache-${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=cache-${{ env.PLATFORM_PAIR }}
           target: core
