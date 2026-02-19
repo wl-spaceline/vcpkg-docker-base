@@ -30,7 +30,10 @@ RUN apt update && apt install --yes --quiet --no-install-recommends \
     libxi-dev \
     libxtst-dev \
     libgles2-mesa-dev \
-    libxrandr-dev && apt clean -y && apt autoremove -y && rm -rf /var/lib/apt/lists/*
+    libxrandr-dev \ 
+    libltdl-dev  \
+    flex  \
+    nasm && apt clean -y && apt autoremove -y && rm -rf /var/lib/apt/lists/*
 
 # Create a runner user for better integration with GitHub
 ARG USERNAME=runner
@@ -56,7 +59,7 @@ ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsys
 COPY scripts/cleanup-vcpkg.sh /
 
 # Installing packages in classic mode instead of using a manifest file and cleanung up installation to free some space
-RUN vcpkg install fmt gtest spdlog grpc exiv2 opencv tl-expected boost && /bin/bash /cleanup-vcpkg.sh
+RUN vcpkg install fmt gtest spdlog benchmark tl-expected grpc exiv2 opencv gstreamer && /bin/bash /cleanup-vcpkg.sh
 RUN vcpkg list > /vcpkg-list.txt && cat /vcpkg-list.txt
 
 FROM scratch AS artifact
