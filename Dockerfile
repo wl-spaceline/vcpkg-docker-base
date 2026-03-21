@@ -59,7 +59,7 @@ ENV PATH=${VCPKG_ROOT}:$PATH CMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsys
 COPY scripts/cleanup-vcpkg.sh /
 
 # Installing packages in classic mode instead of using a manifest file and cleanung up installation to free some space
-RUN vcpkg install fmt gtest spdlog benchmark tl-expected boost grpc exiv2 opencv gstreamer && /bin/bash /cleanup-vcpkg.sh
+RUN vcpkg install fmt gtest spdlog benchmark tl-expected boost grpc exiv2[xmp,png,nls,bmff] opencv gstreamer && /bin/bash /cleanup-vcpkg.sh
 RUN vcpkg list > /vcpkg-list.txt && cat /vcpkg-list.txt
 
 FROM scratch AS artifact
