@@ -28,8 +28,19 @@ jobs:
       attestations: write
 
     steps:
-      - name: Delete huge unnecessary tools folder
-        run: df -h && rm -rf /opt/hostedtoolcache && df -h
+      - name: Check available disk space before cleanup
+        run: df -h /
+
+      - name: Maximize build space
+        run: |
+          docker system prune -a -f --volumes
+          sudo apt clean -y && sudo apt autoremove -y && sudo rm -rf /var/lib/apt/lists/*
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/hostedtoolcache
+
+      - name: Check available disk space after cleanup
+        run: df -h /
 
       - name: Checking out
         uses: actions/checkout@v5
@@ -82,6 +93,10 @@ jobs:
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
           retention-days: 1
+
+      - name: Available disk space after build
+        run: df -h /
+
 
   merge:
     runs-on: ubuntu-latest
